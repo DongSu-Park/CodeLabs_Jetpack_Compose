@@ -5,16 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +23,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kr.dev.dspark.artspace.model.ArtItem
 import kr.dev.dspark.artspace.ui.theme.ArtSpaceTheme
 
 class MainActivity : ComponentActivity() {
@@ -48,13 +45,33 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ArtSpaceApp() {
-    val artPos by remember { mutableStateOf(0) }
+    var artPos by remember { mutableStateOf(0) }
 
-    ArtSpaceLayout()
+    val artLists = ArrayList<ArtItem>()
+    addArtLists(artLists)
+
+    ArtSpaceLayout(
+        artLists[artPos],
+        prevClicked = {
+            if (artPos > 0) {
+                artPos -= 1
+            }
+        }, nextClicked = {
+            if (artPos < artLists.size - 1) {
+                artPos += 1
+            }
+        })
+}
+
+fun addArtLists(artLists: ArrayList<ArtItem>) {
+    artLists.add(ArtItem(imgRes = R.drawable.open_image_first, title = "Christ Blessing, c. 1310", artist = "Grifo di Tancredi", "c. 1310"))
+    artLists.add(ArtItem(imgRes = R.drawable.open_image_second, title = "Madonna and Child Enthroned with Four Saints, c. 1240/1245", artist = "Margaritone d'Arezzo", year = "c. 1240/1245"))
+    artLists.add(ArtItem(imgRes = R.drawable.open_image_third, title = "The Calling of the Apostles Peter and Andrew, 1308-1311", artist = "Duccio di Buoninsegna", year = "1308-1311"))
+    artLists.add(ArtItem(imgRes = R.drawable.open_image_fourth, title = "Madonna and Child, with the Blessing Christ [middle panel], probably 1340", artist = "Pietro Lorenzetti", year = "probably 1340"))
 }
 
 @Composable
-fun ArtSpaceLayout() {
+fun ArtSpaceLayout(item: ArtItem, prevClicked: () -> Unit, nextClicked: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,9 +83,12 @@ fun ArtSpaceLayout() {
             modifier = Modifier.padding(20.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.open_image_first),
+                painter = painterResource(id = item.imgRes),
                 contentDescription = null,
-                modifier = Modifier.padding(20.dp).fillMaxWidth().height(400.dp)
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+                    .height(400.dp)
             )
         }
 
@@ -82,8 +102,8 @@ fun ArtSpaceLayout() {
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    text = "Artwork Title",
-                    fontSize = 28.sp,
+                    text = item.title,
+                    fontSize = 20.sp,
                     textAlign = TextAlign.Justify,
                     fontWeight = FontWeight.Light
                 )
@@ -91,11 +111,16 @@ fun ArtSpaceLayout() {
 
                 Text(
                     buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Black)) {
-                            append(text = "Artwork Artist" + " ")
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                        ) {
+                            append(text = item.artist + " ")
                         }
                         withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraLight)) {
-                            append(text = "(" + "Year" + ")")
+                            append(text = "(" + item.year + ")")
                         }
                     }
                 )
@@ -110,13 +135,13 @@ fun ArtSpaceLayout() {
                 .padding(start = 20.dp, end = 20.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.width(130.dp)) {
+            Button(onClick = prevClicked, modifier = Modifier.width(130.dp)) {
                 Text(text = "Previous")
             }
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.width(130.dp)) {
+            Button(onClick = nextClicked, modifier = Modifier.width(130.dp)) {
                 Text(text = "Next")
             }
         }
