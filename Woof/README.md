@@ -1,5 +1,7 @@
 Woof App
 ==================================
+해당 프로젝트는 Compose Camp 초급 Codelabs의 실습 프로젝트 입니다.  
+원본 링크 : https://github.com/google-developer-training/basic-android-kotlin-compose-training-woof
 
 The Woof app is a list of dog photos with information about them including their name,
 age, and favorite activity. This app also uses Material Design to create a beautiful app
